@@ -47,6 +47,23 @@ export function PresentationModal({ open, onOpenChange, charts, data, columns }:
     }
   }, [open, charts.length]);
 
+  const generateChartConclusion = (chart: ChartConfig, dataRows: DataRow[]) => {
+    if (!chart) return "";
+    const xLabel = chart.xAxis || "X";
+    const yLabel = chart.yAxis || "Y";
+    if (chart.yAxis) {
+      const numericValues = dataRows
+        .map(row => Number(row[chart.yAxis!]))
+        .filter(value => Number.isFinite(value));
+      if (numericValues.length > 0) {
+        const average = numericValues.reduce((sum, val) => sum + val, 0) / numericValues.length;
+        const maximum = Math.max(...numericValues);
+        return `This ${chart.type} highlights ${yLabel} across ${xLabel}. Average ${yLabel} is ${average.toFixed(2)}, with a peak value of ${maximum.toLocaleString()}.`;
+      }
+    }
+    return `This ${chart.type} visualizes ${xLabel}${chart.yAxis ? ` vs ${yLabel}` : ""} across ${dataRows.length} records.`;
+  };
+
   const renderSlide = () => {
     if (currentSlide === 0) {
       // Overview slide
@@ -127,16 +144,32 @@ export function PresentationModal({ open, onOpenChange, charts, data, columns }:
 
     return (
       <div className="h-full p-8">
-        <div className="grid grid-cols-3 gap-8 h-full">
+        <div className="grid grid-cols-3 gap-8 h-full min-h-0">
           {/* Chart */}
-          <div className="col-span-2">
-            <ChartCard
-              config={chart}
-              data={data}
-              columns={columns}
-              onUpdate={() => {}}
-              onDelete={() => {}}
-            />
+          <div className="col-span-2 min-h-0 flex flex-col overflow-hidden">
+            <div className="flex-1 w-full h-0 min-h-0 max-h-[calc(90vh-220px)] overflow-auto pr-2">
+              <div className="w-full h-full flex items-center justify-center">
+                <ChartCard
+                  config={chart}
+                  data={data}
+                  columns={columns}
+                  onUpdate={() => {}}
+                  onDelete={() => {}}
+                />
+              </div>
+            </div>
+            <div className="mt-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm">Conclusion</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground truncate" title={generateChartConclusion(chart, data)}>
+                    {generateChartConclusion(chart, data)}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
 
           {/* Insights */}
@@ -209,7 +242,7 @@ export function PresentationModal({ open, onOpenChange, charts, data, columns }:
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-7xl h-[90vh] p-0">
+      <DialogContent className="max-w-7xl h-[90vh] p-0 [&>button]:hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-4">

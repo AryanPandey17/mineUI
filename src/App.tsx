@@ -100,7 +100,7 @@ const SplashScreen = () => {
         }
 
         .grid-line {
-          stroke: #E5E7EB;
+          stroke: #e6e6e6ff;
           stroke-width: 1;
         }
       `}</style>

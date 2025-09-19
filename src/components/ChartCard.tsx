@@ -64,6 +64,7 @@ interface ChartCardProps {
   onUpdate: (config: ChartConfig) => void;
   onDelete: (id: string) => void;
   onExportImage?: (id: string) => void;
+  dragHandleProps?: Record<string, any>;
 }
 
 const CHART_COLORS = [
@@ -75,7 +76,7 @@ const CHART_COLORS = [
   'hsl(var(--chart-6))',
 ];
 
-export function ChartCard({ config, data, columns, onUpdate, onDelete, onExportImage }: ChartCardProps) {
+export function ChartCard({ config, data, columns, onUpdate, onDelete, onExportImage, dragHandleProps }: ChartCardProps) {
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [editConfig, setEditConfig] = useState<ChartConfig>(config);
   const chartRef = useRef<HTMLDivElement>(null);
@@ -361,7 +362,14 @@ export function ChartCard({ config, data, columns, onUpdate, onDelete, onExportI
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center gap-2">
-          <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div
+            className="h-4 w-4 text-muted-foreground cursor-grab opacity-0 group-hover:opacity-100 transition-opacity flex items-center"
+            title="Drag to reorder"
+            aria-label="Drag handle"
+            {...(dragHandleProps || {})}
+          >
+            <GripVertical className="h-4 w-4" />
+          </div>
           <CardTitle className="text-lg">{config.title}</CardTitle>
           <Badge variant="outline" className="text-xs">
             {config.type}

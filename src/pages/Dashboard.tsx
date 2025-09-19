@@ -52,13 +52,14 @@ function SortableChartCard({ chart, data, columns, onUpdate, onDelete }: {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef} style={style} {...attributes}>
       <ChartCard
         config={chart}
         data={data}
         columns={columns}
         onUpdate={onUpdate}
         onDelete={onDelete}
+        dragHandleProps={listeners}
       />
     </div>
   );
